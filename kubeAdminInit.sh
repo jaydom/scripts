@@ -1,7 +1,7 @@
 # set kubectl completion 
 source <(kubectl completion bash)
 # set args
-read -p  "podCIDR(default 10.244.0.0/16):" _podCIDR
+read -t 15 -p  "podCIDR(default 10.244.0.0/16 timeout 15s):" _podCIDR
 podCIDR=${_podCIDR:-"10.244.0.0/16"}
 # add iptables rules
 ports=(
@@ -15,6 +15,8 @@ do
     iptables -I INPUT -p tcp --dport $n -j ACCEPT
   }
 done
+# flannel(vxlan) use port 8472
+iptables -I INPUT -p udp --dport 8472 -j ACCEPT
 # 
 echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
 echo 1 > /proc/sys/net/bridge/bridge-nf-call-ip6tables
@@ -50,6 +52,11 @@ do
     iptables -I INPUT -p tcp --dport \$n -j ACCEPT
   }
 done
+# flannel(vxlan) use port 8472
+iptables -I INPUT -p udp --dport 8472 -j ACCEPT
+# 
+echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
+echo 1 > /proc/sys/net/bridge/bridge-nf-call-ip6tables
 # shutdown selinux
 setenforce 0
 # disable swap
@@ -57,4 +64,6 @@ swapoff -a
 # kubeadm init
 eof
  
-grep "kubeadm join.*token.*sha.*" kubeadm.log >>kubeAdminJoin.sh 
+grep "kubeadm join.*token.*sha.*" kubeadm.log >>kubeAdminJoin.sh
+
+ 
