@@ -33,9 +33,9 @@ kubeadm init --pod-network-cidr=$podCIDR &> kubeadm.log
 mkdir -p $HOME/.kube
 /bin/cp /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
-# set flannel (https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml)
-cat flannel/kube-flannel.yml |sed s%"10.244.0.0/16"%$podCIDR%g |sed s%"quay.io/coreos/flannel:v0.10.0-amd64"%"kubernetes-master:5000/coreos/flannel:v0.10.0-amd64"%g >my-kube-flannel.yml
-cat my-kube-flannel.yml | kubectl apply -f -
+# set flannel & multus (https://raw.githubusercontent.com/intel/multus-cni/master/images/{flannel-deamonset.yml,multus-deamonset.yml})
+cat my-flannel-deamonset.yml |kubectl apply -f -
+cat my-multus-deamonset.yml |kubectl apply -f -
 
 # create the kubeAdminJoin.sh script
 cat >kubeAdminJoin.sh <<eof
