@@ -1,3 +1,18 @@
+# check docker images
+dockerImageList=(
+"kubernetes-master:5000/coreos/flannel:v0.10.0-amd64"
+"kubernetes-master:5000/busybox:1.29"
+"kubernetes-master:5000/nfvpe/multus:latest"
+)
+for i in ${dockerImageList[*]}
+do
+  docker pull $i
+  [ $? == "0" ]||{
+     echo "缺少镜像"
+     exit 1
+  }
+done
+
 # set kubectl completion 
 source <(kubectl completion bash)
 # set args
@@ -34,8 +49,16 @@ mkdir -p $HOME/.kube
 /bin/cp /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
 # set flannel & multus (https://raw.githubusercontent.com/intel/multus-cni/master/images/{flannel-deamonset.yml,multus-deamonset.yml})
-cat my-flannel-deamonset.yml |kubectl apply -f -
-cat my-multus-deamonset.yml |kubectl apply -f -
+
+cat multus/flannel-daemonset.yml |kubectl apply -f -
+cat multus/multus-daemonset.yml |kubectl apply -f -
+
+# create CRD and add macvlan conf
+cat multus/demo/macvlan-conf.yml |kubectl create -f -
+
+# create samples
+cat multus/demo/sample-pod.yml |kubectl create -f -
+
 
 # create the kubeAdminJoin.sh script
 cat >kubeAdminJoin.sh <<eof
@@ -61,6 +84,8 @@ echo 1 > /proc/sys/net/bridge/bridge-nf-call-ip6tables
 setenforce 0
 # disable swap
 swapoff -a
+# set eth1 
+ip link set eth1 promisc on
 # kubeadm init
 eof
  

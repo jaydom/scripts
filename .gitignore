@@ -1,3 +1,6 @@
 sslocal.sh
 
 kubeAdminJoin.sh
+my-kube-flannel.yml
+my-flannel-deamonset.yml
+my-multus-deamonset.yml
