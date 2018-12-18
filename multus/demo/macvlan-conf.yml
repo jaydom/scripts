@@ -7,7 +7,7 @@ spec:
       "cniVersion": "0.3.0",
       "type": "macvlan",
       "master": "eth1",
-      "mode": "passthru",
+      "mode": "bridge",
       "ipam": {
         "type": "host-local",
         "subnet": "192.168.222.0/24",
@@ -30,7 +30,7 @@ spec:
       "cniVersion": "0.3.0",
       "type": "macvlan",
       "master": "eth1",
-      "mode": "passthru",
+      "mode": "bridge",
       "ipam": {
         "type": "host-local",
         "subnet": "192.168.222.0/24",

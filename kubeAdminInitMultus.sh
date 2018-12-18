@@ -49,16 +49,10 @@ mkdir -p $HOME/.kube
 /bin/cp /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
 # set flannel & multus (https://raw.githubusercontent.com/intel/multus-cni/master/images/{flannel-deamonset.yml,multus-deamonset.yml})
-
 cat multus/flannel-daemonset.yml |kubectl apply -f -
 cat multus/multus-daemonset.yml |kubectl apply -f -
-
 # create CRD and add macvlan conf
 cat multus/demo/macvlan-conf.yml |kubectl create -f -
-
-# create samples
-cat multus/demo/sample-pod.yml |kubectl create -f -
-
 
 # create the kubeAdminJoin.sh script
 cat >kubeAdminJoin.sh <<eof
